@@ -2,18 +2,34 @@ import React, { useState, useCallback, FormEvent } from "react";
 import PageHeader from "../../components/PageHeader";
 
 import "./styles.css";
-import TeacherItem from "../../components/TeacherItem";
+import TeacherItem, { TeacherProps } from "../../components/TeacherItem";
 import Input from "../../components/Input";
 import Select from "../../components/Select";
+import api from "../../services/api";
 
 function TeacherList() {
   const [subject, setSubject] = useState("");
   const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
 
-  const handleSearchTeachers = useCallback((e: FormEvent) => {
-    e.preventDefault();
-  }, []);
+  const [teachers, setTeachers] = useState([]);
+
+  const handleSearchTeachers = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+
+      const response = await api.get("classes", {
+        params: {
+          subject,
+          week_day: weekday,
+          time,
+        },
+      });
+
+      setTeachers(response.data);
+    },
+    [subject, time, weekday]
+  );
 
   return (
     <div id="page-teacher-list" className="container">
@@ -74,11 +90,9 @@ function TeacherList() {
       </PageHeader>
 
       <main>
-        <TeacherItem />
-        <TeacherItem />
-        <TeacherItem />
-        <TeacherItem />
-        <TeacherItem />
+        {teachers.map((teacher: TeacherProps) => {
+          return <TeacherItem key={teacher.id} teacher={teacher} />;
+        })}
       </main>
     </div>
   );

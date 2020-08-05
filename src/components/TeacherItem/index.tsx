@@ -1,40 +1,56 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 import whatsappIcon from "../../assets/images/icons/whatsapp.svg";
 
 import "./styles.css";
+import api from "../../services/api";
 
-const TeacherItem: React.FC = () => {
+export interface TeacherProps {
+  id: number;
+  name: string;
+  avatar: string;
+  subject: string;
+  bio: string;
+  cost: number;
+  whatsapp: string;
+}
+
+interface TeacherItemProps {
+  teacher: TeacherProps;
+}
+
+const TeacherItem: React.FC<TeacherItemProps> = ({ teacher }) => {
+  const createNewConnection = useCallback(() => {
+    api.post("/connections", { user_id: teacher.id });
+  }, [teacher.id]);
+
   return (
     <article className="teacher-item">
       <header>
-        <img
-          src="https://avatars1.githubusercontent.com/u/62630564?s=460&u=0bd409e66cbd825a73e3e04424d878ead6eca9a9&v=4"
-          alt="Beatriz Murase"
-        />
+        <img src={teacher.avatar} alt={teacher.name} />
         <div>
-          <strong>Beatriz Murase</strong>
-          <span>Química</span>
+          <strong>{teacher.name}</strong>
+          <span>{teacher.subject}</span>
         </div>
       </header>
 
-      <p>
-        Entusiasta das melhores tecnologias de química avançada.
-        <br /> <br />
-        Apaixonada por explodir coisas em laboratório e por mudar a vida das
-        pessoas através de experiências. Mais de 200.000 pessoas já passaram por
-        uma das minhas explosões.
-      </p>
+      <p>{teacher.bio}</p>
 
       <footer>
         <p>
           Preço/hora
-          <strong>R$ 80,00</strong>
+          <strong>R$ {teacher.cost}</strong>
         </p>
-        <button type="button">
+        <a
+          onClick={createNewConnection}
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`http://wa.me/${teacher.whatsapp}`}
+          type="button"
+        >
           <img src={whatsappIcon} alt="WhatsApp" />
           Entrar em contato
-        </button>
+        </a>
       </footer>
     </article>
   );
